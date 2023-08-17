@@ -1,6 +1,7 @@
 local M = {}
 
 local util = require('code-commands.util')
+local conditions = require('code-commands.conditions')
 
 local function format(buf, opts)
   local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
@@ -10,22 +11,29 @@ local function format(buf, opts)
 
   local cwd = util.get_root()
 
-  for _, formatter in ipairs(opts.formatters) do
-    pcall(function()
-      if formatter.condition == nil or formatter.condition() then
-        -- TODO handle formatters not using stdin
+  local formatters = conditions.resolve(
+    opts.formatters,
+    conditions.CreateAPI({
+      buffer = buf,
+    })
+  )
 
-        local out, success = util.run_command(formatter, {
-          lines = lines,
-          cwd = cwd,
-          filename = fname,
-        })
+  for _, formatter in ipairs(formatters) do
+    local success, err = pcall(function()
+      local out, success = util.run_command(formatter, {
+        lines = lines,
+        cwd = cwd,
+        filename = fname,
+      })
 
-        if success and out ~= nil and out ~= '' then
-          lines = vim.split(out, '\n')
-        end
+      if success and out ~= nil and out ~= '' then
+        lines = vim.split(out, '\n')
       end
     end)
+
+    if not success then
+      print('[error]', err)
+    end
   end
 
   if changedtick == vim.api.nvim_buf_get_changedtick(buf) then

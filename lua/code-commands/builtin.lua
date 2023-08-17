@@ -21,9 +21,6 @@ M.formatters = {
 
   prettier = {
     name = 'prettier',
-    -- condition = function()
-    --   return true
-    -- end,
     cmd = 'prettier',
     args = { '--stdin-filepath', '$FILENAME' },
     stdin = true,
@@ -85,6 +82,7 @@ M.linters = {
           lnum = e.line - 1,
           message = e.message,
           severity = e.severity,
+          code = e.ruleId,
         }
       end, messages)
     end,
@@ -105,6 +103,7 @@ M.linters = {
           lnum = e.line - 1,
           message = e.message,
           severity = e.severity,
+          code = e.ruleId,
         }
       end, messages)
     end,

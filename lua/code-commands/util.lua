@@ -90,17 +90,29 @@ function M.update_buffer(bufnr, lines, srow, erow)
 end
 
 function M.run_command(cmd, opts)
+  local fn_args = {
+    root = opts.cwd,
+    filename = opts.filename,
+  }
+
+  if type(cmd.fn) == 'function' then
+    return cmd.fn(fn_args)
+  end
+
+  local cmd_cmd = cmd.cmd or {}
+  if type(cmd.args) == 'function' then
+    cmd_cmd = cmd.cmd(fn_args)
+  end
+
   local args = cmd.args or {}
   if type(cmd.args) == 'function' then
-    args = cmd.args({
-      root = opts.cwd,
-      filename = opts.filename,
-    })
+    args = cmd.args(fn_args)
   end
 
   local out, success = M.exec(vim.tbl_extend('force', cmd, {
     lines = cmd.stdin and opts.lines or nil,
     cwd = opts.cwd,
+    cmd = cmd_cmd,
     args = vim.tbl_map(function(arg)
       arg = arg:gsub('$FILENAME', opts.filename)
       return arg

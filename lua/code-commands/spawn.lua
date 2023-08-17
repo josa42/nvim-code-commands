@@ -99,7 +99,7 @@ end
 function M.try_spawn(opt)
   local ok, out = pcall(spawn, opt)
   if not ok then
-    print(out)
+    print('[error]', out)
     return
   end
   return out
