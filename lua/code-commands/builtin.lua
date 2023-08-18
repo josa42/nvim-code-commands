@@ -64,6 +64,8 @@ M.formatters = {
     cmd = 'fixjson',
     stdin = true,
   },
+
+  lsp = require('code-commands.builtin.lsp').create,
 }
 
 M.linters = {
