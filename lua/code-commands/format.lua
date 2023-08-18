@@ -11,12 +11,7 @@ local function format(buf, opts)
 
   local cwd = util.get_root()
 
-  local formatters = conditions.resolve(
-    opts.formatters,
-    conditions.CreateAPI({
-      buffer = buf,
-    })
-  )
+  local formatters = conditions.resolve(opts.formatters, conditions.CreateAPI({ buffer = buf }))
 
   for _, formatter in ipairs(formatters) do
     local success, err = pcall(function()

@@ -7,7 +7,6 @@ local events_live = { 'BufEnter', 'TextChanged', 'InsertLeave', 'BufWritePost' }
 -- local events_default = { 'BufEnter', 'BufWritePost' }
 
 local function lint(buf, opts)
-  local bufname = vim.api.nvim_buf_get_name(buf)
   local fname = vim.fn.fnameescape(vim.api.nvim_buf_get_name(buf))
   local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
 
@@ -15,12 +14,7 @@ local function lint(buf, opts)
     local ok, err = pcall(function()
       local cwd = util.get_root()
 
-      local linters = conditions.resolve(
-        opts.linters,
-        conditions.CreateAPI({
-          buffer = buf,
-        })
-      )
+      local linters = conditions.resolve(opts.linters, conditions.CreateAPI({ buffer = buf }))
 
       for _, linter in ipairs(linters) do
         linter.namespace = linter.namespace
