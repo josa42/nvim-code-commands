@@ -1,6 +1,14 @@
+local fs = require('code-commands.fs')
+
 local M = {
   name = 'eslint',
-  cmd = 'eslint',
+  cmd = function(ctx)
+    local local_eslint = vim.fs.joinpath(ctx.root, 'node_modules/.bin/eslint')
+    if fs.exists(local_eslint) then
+      return local_eslint
+    end
+    return 'eslint'
+  end,
   args = { '-f', 'json', '--stdin', '--stdin-filename', '$FILENAME' },
   stdin = true,
   output_fmt = function(result)

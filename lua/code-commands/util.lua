@@ -1,5 +1,7 @@
 local M = {}
 
+local fs = require('code-commands.fs')
+
 ---@diagnostic disable-next-line: deprecated
 local uv = vim.version().minor >= 10 and vim.uv or vim.loop
 
@@ -101,7 +103,7 @@ function M.run_command(cmd, opts)
   end
 
   local cmd_cmd = cmd.cmd or {}
-  if type(cmd.args) == 'function' then
+  if type(cmd.cmd) == 'function' then
     cmd_cmd = cmd.cmd(fn_args)
   end
 
@@ -110,7 +112,7 @@ function M.run_command(cmd, opts)
     args = cmd.args(fn_args)
   end
 
-  local out, success = M.exec(vim.tbl_extend('force', cmd, {
+  local out, status = M.exec(vim.tbl_extend('force', cmd, {
     lines = cmd.stdin and opts.lines or nil,
     cwd = opts.cwd,
     cmd = cmd_cmd,
@@ -119,6 +121,11 @@ function M.run_command(cmd, opts)
       return arg
     end, args),
   }))
+
+  local success = status == 0
+  if cmd.success_exit_codes ~= nil then
+    success = vim.tbl_contains(cmd.success_exit_codes, status)
+  end
 
   if #out > 0 then
     if cmd.output_fmt then
@@ -137,7 +144,7 @@ function M.exec(opt)
   local timeout = opt.timeout or 2000
 
   local results
-  local status = 0
+  local status = -1
   local done = false
 
   local chunks = {}
@@ -194,7 +201,7 @@ function M.exec(opt)
     handle:close()
   end
 
-  return results, status == 0
+  return results, status
 end
 
 return M

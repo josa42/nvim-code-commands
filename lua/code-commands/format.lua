@@ -8,6 +8,7 @@ local function format(buf, opts)
   local fname = vim.fn.fnameescape(vim.api.nvim_buf_get_name(buf))
 
   local changedtick = vim.api.nvim_buf_get_changedtick(buf)
+  local changed = false
 
   local cwd = util.get_root()
 
@@ -24,6 +25,7 @@ local function format(buf, opts)
 
       if success and out ~= nil and out ~= '' then
         lines = vim.split(out, '\n')
+        changed = true
       end
     end)
 
@@ -32,7 +34,7 @@ local function format(buf, opts)
     end
   end
 
-  if changedtick == vim.api.nvim_buf_get_changedtick(buf) then
+  if changed and changedtick == vim.api.nvim_buf_get_changedtick(buf) then
     util.update_buffer(buf, lines, 0, -1)
   end
 end
