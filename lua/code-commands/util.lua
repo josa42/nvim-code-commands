@@ -91,8 +91,9 @@ end
 
 function M.run_command(cmd, opts)
   local fn_args = {
-    root = opts.cwd,
+    buffer = opts.buffer,
     filename = opts.filename,
+    root = opts.cwd,
   }
 
   if type(cmd.fn) == 'function' then

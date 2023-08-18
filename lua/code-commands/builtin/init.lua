@@ -8,7 +8,7 @@ M.formatters = {
   shfmt = require('code-commands.builtin.formatters.shfmt'),
   swiftformat = require('code-commands.builtin.formatters.swiftformat'),
   fixjson = require('code-commands.builtin.formatters.fixjson'),
-  lsp = require('code-commands.builtin.lsp').create,
+  lsp = require('code-commands.builtin.formatters.lsp'),
 }
 
 M.linters = {

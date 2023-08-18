@@ -1,10 +1,22 @@
 local l = {}
 
-local M = {}
+local M = {
+  name = 'lsp-format',
+  fn = function(ctx)
+    local client = vim.lsp.get_clients({ bufnr = ctx.buffer, method = 'textDocument/formatting' })[1]
+    if client ~= nil then
+      l.buf_formatting(client, ctx.buffer)
+    end
+  end,
+}
 
-function M.create(name)
+function M.using(name)
   return function(ctx)
-    local client = l.select_client('textDocument/formatting', name)
+    local client = vim.lsp.get_clients({
+      method = 'textDocument/formatting',
+      name = name,
+    })[1]
+
     if client ~= nil then
       return {
         name = ('lsp-format:%s'):format(name),
@@ -67,26 +79,6 @@ function l.request(client, method, params, bufnr, apply_fn)
   if apply_fn ~= nil and response ~= nil and response.result ~= nil then
     apply_fn(response.result)
   end
-end
-
-function l.select_client(method, client_name)
-  local clients = vim.tbl_filter(function(client)
-    return client.supports_method(method)
-  end, vim.tbl_values(vim.lsp.get_clients()))
-
-  table.sort(clients, function(a, b)
-    return a.name < b.name
-  end)
-
-  local client = vim.tbl_filter(function(client)
-    return client.name == client_name
-  end, clients)[1]
-
-  if client ~= nil then
-    return client
-  end
-
-  return nil
 end
 
 return M

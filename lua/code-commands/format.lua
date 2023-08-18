@@ -16,9 +16,10 @@ local function format(buf, opts)
   for _, formatter in ipairs(formatters) do
     local success, err = pcall(function()
       local out, success = util.run_command(formatter, {
-        lines = lines,
+        buffer = buf,
         cwd = cwd,
         filename = fname,
+        lines = lines,
       })
 
       if success and out ~= nil and out ~= '' then

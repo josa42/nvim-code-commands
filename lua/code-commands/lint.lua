@@ -21,9 +21,10 @@ local function lint(buf, opts)
           or vim.api.nvim_create_namespace(('jg.code-commands.lint.%s'):format(linter.name))
 
         local results = util.run_command(linter, {
-          lines = lines,
+          buffer = buf,
           cwd = cwd,
           filename = fname,
+          lines = lines,
         }) or {}
 
         vim.schedule(function()

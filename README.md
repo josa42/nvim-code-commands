@@ -17,6 +17,36 @@ cmds.register({
 })
 ```
 
+<br>
+
+### LSP formatter
+
+Format using any attached language server.
+
+```lua
+cmds.register({
+  filetypes = { 'go' },
+  formatters = {
+    cmds.formatters.lsp,
+  },
+})
+```
+
+<br>
+
+Format using a specific attached language server.
+
+```lua
+cmds.register({
+  filetypes = { 'go' },
+  formatters = {
+    cmds.formatters.lsp.with('gopls'),
+  },
+})
+```
+
+<br><br>
+
 ## Credit
 
 - [guard.nvim](https://github.com/nvimdev/guard.nvim)
