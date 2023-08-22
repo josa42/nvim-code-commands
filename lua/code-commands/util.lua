@@ -148,11 +148,12 @@ function M.exec(opt)
   local done = false
 
   local chunks = {}
-  local handle
 
   local stdin = opt.lines and assert(uv.new_pipe()) or nil
   local stdout = assert(uv.new_pipe())
   local stderr = assert(uv.new_pipe())
+
+  local handle
 
   handle = uv.spawn(
     opt.cmd,
@@ -176,6 +177,10 @@ function M.exec(opt)
     end)
   )
 
+  if handle == nil then
+    return '', -1
+  end
+
   local on_read = function(_, chunk)
     if chunk then
       table.insert(chunks, chunk)
@@ -197,7 +202,7 @@ function M.exec(opt)
     return done
   end, 10)
 
-  if not handle:is_closing() then
+  if handle and not handle:is_closing() then
     handle:close()
   end
 
