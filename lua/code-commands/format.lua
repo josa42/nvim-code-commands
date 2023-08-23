@@ -2,22 +2,27 @@ local M = {}
 
 local util = require('code-commands.util')
 local conditions = require('code-commands.conditions')
+local buf = require('code-commands.buf')
 
-local function format(buf, opts)
-  local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-  local fname = vim.fn.fnameescape(vim.api.nvim_buf_get_name(buf))
+local function format(bufnr, opts)
+  if buf.get_var(bufnr, 'format:disabled') then
+    return
+  end
 
-  local changedtick = vim.api.nvim_buf_get_changedtick(buf)
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local fname = vim.fn.fnameescape(vim.api.nvim_buf_get_name(bufnr))
+
+  local changedtick = vim.api.nvim_buf_get_changedtick(bufnr)
   local changed = false
 
   local cwd = util.get_root()
 
-  local formatters = conditions.resolve(opts.formatters, conditions.CreateAPI({ buffer = buf }))
+  local formatters = conditions.resolve(opts.formatters, conditions.CreateAPI({ buffer = bufnr }))
 
   for _, formatter in ipairs(formatters) do
     local success, err = pcall(function()
       local out, success = util.run_command(formatter, {
-        buffer = buf,
+        buffer = bufnr,
         cwd = cwd,
         filename = fname,
         lines = lines,
@@ -34,8 +39,8 @@ local function format(buf, opts)
     end
   end
 
-  if changed and changedtick == vim.api.nvim_buf_get_changedtick(buf) then
-    util.update_buffer(buf, lines, 0, -1)
+  if changed and changedtick == vim.api.nvim_buf_get_changedtick(bufnr) then
+    util.update_buffer(bufnr, lines, 0, -1)
   end
 end
 
