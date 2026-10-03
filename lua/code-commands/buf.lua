@@ -13,4 +13,3 @@ function M.set_var(buf, key, value)
 end
 
 return M
-
